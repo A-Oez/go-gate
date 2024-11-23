@@ -1,0 +1,11 @@
+{
+    "mapping": [
+      {
+        "method": "GET",
+        "client_path": "/api",
+        "service_scheme": "http",
+        "service_host": "apitest:8080",
+        "service_path": "/test"
+      }
+    ]
+}
