@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/http/httputil"
+	"strings"
 	"time"
 )
 
@@ -39,7 +40,7 @@ func ReverseProxy() http.Handler {
 
 		proxyRoute, err := FindRouteMapping(ClientRequest{
 			Method: r.Method,
-			Path: r.URL.Path,
+			Path: TrimSuffix(r.URL.Path),
 		},"")
 		if err != nil {
 			log.Println(err.Error())
@@ -74,3 +75,9 @@ func ReverseProxy() http.Handler {
     })
 }
 
+func TrimSuffix(path string) string {
+    if strings.HasSuffix(path, "/") {
+        return path[:len(path)-1]
+    }
+    return path
+}

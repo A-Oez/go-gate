@@ -2,6 +2,7 @@ package test
 
 import (
 	"go-gate/internal/server/handler/proxy"
+	"strings"
 	"testing"
 )
 
@@ -17,3 +18,15 @@ func TestProxyRouting(t *testing.T) {
 	t.Log(proxyRoute.ServiceHost)
 	t.Log(proxyRoute.ServicePath)
 }
+
+func TestTrimSuffix(t *testing.T) {
+	path := "/api/"
+	str := proxy.TrimSuffix(path)
+	t.Log(str)
+
+	if strings.HasSuffix(str, "/") {
+		t.Errorf("path %s has suffix /", path)
+	}
+
+}
+
