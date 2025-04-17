@@ -2,7 +2,7 @@ package proxy
 
 import (
 	"encoding/json"
-	"go-gate/internal/server/handler/logging"
+	"go-gate/backend/internal/server/handler/logging"
 	"log"
 	"net/http"
 	"net/http/httputil"

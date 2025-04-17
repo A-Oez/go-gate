@@ -1,9 +1,9 @@
 package router
 
 import (
-	"go-gate/internal/server/handler/limiter"
-	"go-gate/internal/server/handler/logging"
-	"go-gate/internal/server/handler/proxy"
+	"go-gate/backend/internal/server/handler/limiter"
+	"go-gate/backend/internal/server/handler/logging"
+	"go-gate/backend/internal/server/handler/proxy"
 	"net/http"
 )
 

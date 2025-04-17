@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-gate/internal/server/router"
+	"go-gate/backend/internal/server/router"
 	"log"
 	"net/http"
 )
@@ -13,5 +13,5 @@ func main() {
 	log.Println("HTTPS Server runs on port :3030")
 
 	//start server with ssl/tls
-	log.Fatal(http.ListenAndServeTLS(":3030", "./certs/gateway.pem", "./certs/gateway-key.pem", mux))
+	log.Fatal(http.ListenAndServe(":3030", mux))
 }
