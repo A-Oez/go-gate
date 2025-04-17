@@ -53,10 +53,16 @@ func ReverseProxy() http.Handler {
 		proxy.Director = func(req *http.Request) {
 			//delete to prevent ip spooling
 			req.Header.Del("X-Forwarded-For")
+			req.Header.Del("X-Real-IP")
 
 			req.URL.Scheme = proxyRoute.ServiceScheme
 			req.URL.Host = proxyRoute.ServiceHost
 			req.URL.Path = proxyRoute.ServicePath
+
+			req.Header.Set("X-Forwarded-Proto", "https")
+			req.Header.Set("X-Forwarded-Host", req.Host)
+			req.Header.Set("X-Request-ID", requestID)
+			req.Header.Set("X-Request-Timestamp", time.Now().Format(time.RFC3339))
 		}
         lrw := &statusCapturingResponseWriter{w, http.StatusOK}
 
