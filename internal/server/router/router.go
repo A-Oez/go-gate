@@ -1,12 +1,11 @@
 package router
 
 import (
-	"go-gate/internal/server/handler/limiter"
-	"go-gate/internal/server/handler/logging"
 	"go-gate/internal/server/handler/proxy"
+	"go-gate/internal/server/middleware"
 	"net/http"
 )
 
 func RegisterRouter(mux *http.ServeMux) {  
-	mux.Handle("/api/", limiter.RateLimiter(logging.InboundLogging(proxy.ReverseProxy())))
+	mux.Handle("/api/", middleware.Handle()(proxy.ReverseProxy()))
 }

@@ -1,17 +1,29 @@
-package test
+package routing
 
 import (
-	"go-gate/internal/server/handler/proxy"
 	"strings"
 	"testing"
 )
 
 
 func TestProxyRouting(t *testing.T) {
-    proxyRoute, err := proxy.FindRouteMapping(proxy.ClientRequest{
+	jsonData := `{
+		"mapping": [
+			{
+				"method": "GET",
+				"client_path": "/api",
+				"service_scheme": "http",
+				"service_host": "example.com",
+				"service_path": "/real-api"
+			}
+		]
+	}`
+	r := strings.NewReader(jsonData)
+
+    proxyRoute, err := FindRouteMapping(ClientRequest{
 		Method: "GET",
 		Path: "/api",
-	},"../internal/server/config/proxy_mapping.json")
+	}, r)
 	if err != nil{
 		t.Error(err)
 	}
@@ -21,7 +33,7 @@ func TestProxyRouting(t *testing.T) {
 
 func TestTrimSuffix(t *testing.T) {
 	path := "/api/"
-	str := proxy.TrimSuffix(path)
+	str := TrimSuffix(path)
 	t.Log(str)
 
 	if strings.HasSuffix(str, "/") {
@@ -29,4 +41,3 @@ func TestTrimSuffix(t *testing.T) {
 	}
 
 }
-
