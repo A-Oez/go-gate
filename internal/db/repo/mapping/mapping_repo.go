@@ -35,8 +35,8 @@ func (r *MappingRepository) GetAll() ([]entity.ProxyMapping, error) {
 	return mappings, nil
 }
 
-func (r *MappingRepository) GetRequestByClient(method string, publicPath string) (*entity.ProxyMapping, error) {
-	mapping := &entity.ProxyMapping{}
+func (r *MappingRepository) GetRequestByClient(method string, publicPath string) (entity.ProxyMapping, error) {
+	var mapping entity.ProxyMapping
 
 	query := `
 		SELECT *

@@ -7,7 +7,7 @@ import (
 
 type MappingRepository interface {
 	GetAll() ([]entity.ProxyMapping, error)
-	GetRequestByClient(method string, publicPath string) (*entity.ProxyMapping, error)
+	GetRequestByClient(method string, publicPath string) (entity.ProxyMapping, error)
 }
 
 type MappingService struct {
@@ -29,8 +29,8 @@ func (ms *MappingService) GetAllMappings() ([]entity.ProxyMapping, error) {
 	return mappings, nil
 }
 
-func (ms *MappingService) GetRequestByClient(method string, publicPath string) (*entity.ProxyMapping, error) {
-	var mapping *entity.ProxyMapping
+func (ms *MappingService) GetRequestByClient(method string, publicPath string) (entity.ProxyMapping, error) {
+	var mapping entity.ProxyMapping
 	
 	mapping, err := ms.MappingRepository.GetRequestByClient(method, publicPath)
 	if err != nil {

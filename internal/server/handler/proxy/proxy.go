@@ -46,7 +46,7 @@ func getRequestID(r *http.Request) string {
 	return id
 }
 
-func newReverseProxy(requestID string, entity *entity.ProxyMapping) *httputil.ReverseProxy {
+func newReverseProxy(requestID string, entity entity.ProxyMapping) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.Header.Del("X-Forwarded-For")

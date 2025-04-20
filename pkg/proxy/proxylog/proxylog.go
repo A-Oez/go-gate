@@ -27,7 +27,7 @@ type proxyLogEntry struct {
 	Timestamp    string `json:"timestamp"`
 }
 
-func Log(statusCode int, requestID string, entity *entity.ProxyMapping) {
+func Log(statusCode int, requestID string, entity entity.ProxyMapping) {
 	entry := proxyLogEntry{
 		RequestID:  requestID,
 		ClientPath: entity.PublicPath,
