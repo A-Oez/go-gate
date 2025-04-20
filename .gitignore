@@ -1,2 +1,2 @@
-docker-compose.yaml
-*.pem
+docker-compose.yml
+.env

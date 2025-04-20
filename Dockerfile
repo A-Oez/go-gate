@@ -1,4 +1,4 @@
-FROM golang:1.23-alpine
+FROM golang:1.24.2-alpine
 
 WORKDIR /app
 
@@ -7,11 +7,12 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o /app/cmd/main ./cmd
+RUN go build -o /app/main 
 
 EXPOSE 5000
+ENV BACKEND_PORT=5000
 
-CMD ["/app/cmd/main"]
+CMD ["/app/main"]
 
 #build image: docker build -t go-gate .
-#start container: docker run -p 5000:3030 go-gate 
+#start container: docker run -p 5000:5000 go-gate 

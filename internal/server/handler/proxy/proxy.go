@@ -1,18 +1,20 @@
 package proxy
 
 import (
-	"encoding/json"
+	"database/sql"
+	entity "go-gate/internal/db/entity/mapping"
+	repo "go-gate/internal/db/repo/mapping"
 	"go-gate/internal/server/middleware/logging"
+	service "go-gate/internal/service/mapping"
 	"go-gate/pkg/proxy/proxylog"
-	"go-gate/pkg/proxy/routing"
 	"log"
 	"net/http"
 	"net/http/httputil"
-	"os"
+	"strings"
 	"time"
 )
 
-func ReverseProxy() http.Handler {
+func ReverseProxy(db *sql.DB) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestID := getRequestID(r)
 		if requestID == "" {
@@ -20,7 +22,8 @@ func ReverseProxy() http.Handler {
 			return
 		}
 
-		proxyRoute, err := findProxyRoute(r)
+		service := service.NewMappingService(repo.NewMappingRepository(db))
+		proxyRoute, err := service.GetRequestByClient(r.Method, trimSuffix(r.URL.Path))
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, "Internal Server Error", http.StatusNotFound)
@@ -31,7 +34,7 @@ func ReverseProxy() http.Handler {
         lrw := &proxylog.LoggingResponseWriter{w, http.StatusOK}
 		proxy.ServeHTTP(lrw, r)
 
-		logProxyRequest(lrw.StatusCode, requestID, proxyRoute)
+		proxylog.Log(lrw.StatusCode, requestID, proxyRoute)
     })
 }
 
@@ -43,29 +46,15 @@ func getRequestID(r *http.Request) string {
 	return id
 }
 
-func findProxyRoute(r *http.Request) (*routing.ProxyRoute, error) {
-	path := "../internal/server/config/proxy_mapping.json"
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer file.Close()
-
-	return routing.FindRouteMapping(routing.ClientRequest{
-		Method: r.Method,
-		Path:   routing.TrimSuffix(r.URL.Path),
-	}, file)
-}
-
-func newReverseProxy(requestID string, route *routing.ProxyRoute) *httputil.ReverseProxy {
+func newReverseProxy(requestID string, entity *entity.ProxyMapping) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.Header.Del("X-Forwarded-For")
 			req.Header.Del("X-Real-IP")
 
-			req.URL.Scheme = route.ServiceScheme
-			req.URL.Host = route.ServiceHost
-			req.URL.Path = route.ServicePath
+			req.URL.Scheme = entity.ServiceScheme
+			req.URL.Host = entity.ServiceHost
+			req.URL.Path = entity.ServicePath
 
 			req.Header.Set("X-Forwarded-Proto", "https")
 			req.Header.Set("X-Forwarded-Host", req.Host)
@@ -75,16 +64,9 @@ func newReverseProxy(requestID string, route *routing.ProxyRoute) *httputil.Reve
 	}
 }
 
-func logProxyRequest(statusCode int, requestID string, route *routing.ProxyRoute) {
-	entry := proxylog.ProxyLogEntry{
-		RequestID:  requestID,
-		ClientPath: route.ClientPath,
-		ServiceURL: route.ServiceHost + route.ServicePath,
-		StatusCode: statusCode,
-		Timestamp:  time.Now().Format(time.RFC3339),
+func trimSuffix(path string) string {
+	if strings.HasSuffix(path, "/") {
+		return path[:len(path)-1]
 	}
-
-	if logBytes, err := json.Marshal(entry); err == nil {
-		log.Println(string(logBytes))
-	}
+	return path
 }
