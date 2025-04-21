@@ -2,9 +2,17 @@ package mapping
 
 type ProxyMapping struct {
 	ID            int    `json:"id"`
-	Method        string `json:"method"`
 	PublicPath    string `json:"public_path"`
-	ServiceScheme string `json:"service_scheme"`
+	Method        string `json:"method"`
 	ServiceHost   string `json:"service_host"`
 	ServicePath   string `json:"service_path"`
+	ServiceScheme string `json:"service_scheme"`
+}
+
+type ProxyMappingAdd struct {
+	PublicPath    string `json:"public_path"`
+	Method        string `json:"method"`
+	ServiceHost   string `json:"service_host"`
+	ServicePath   string `json:"service_path"`
+	ServiceScheme string `json:"service_scheme"`
 }

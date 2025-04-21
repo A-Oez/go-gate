@@ -22,6 +22,11 @@ func NewServer(db *sql.DB) *Server {
 }
 
 func (s *Server) RegisterRouter() {  
-	s.Mux.Handle("/api/", middleware.Handle()(proxy.ReverseProxy(s.Db)))
-	s.Mux.Handle("/api/mapping", limiter.RateLimiter((mapping.GetRequestMappings(s.Db))))
+	//proxy routing
+	s.Mux.Handle("GET /api/", middleware.Handle()(proxy.ReverseProxy(s.Db)))
+
+	//mapping
+	s.Mux.Handle("POST /api/mapping", limiter.RateLimiter((mapping.AddRequest(s.Db))))
+	s.Mux.Handle("GET /api/mapping", limiter.RateLimiter((mapping.GetRequestMappings(s.Db))))
+	s.Mux.Handle("GET /api/mapping/{id}", limiter.RateLimiter((mapping.GetRequestMappingByID(s.Db))))
 }
