@@ -6,6 +6,7 @@ import (
 	"go-gate/internal/service/routes"
 	"go-gate/internal/service/routes/entity"
 	"go-gate/internal/service/routes/repo"
+	"go-gate/pkg/httperror"
 	"io"
 	"net/http"
 	"strconv"
@@ -18,7 +19,10 @@ func GetRequestMappings(db *sql.DB) http.Handler {
 		mappings, err := service.GetAll()
 
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Err: routes.ErrDBQueryFailed,
+			}.WriteError(w)
 			return
 		}		
 
@@ -33,13 +37,19 @@ func GetRequestMappingByID(db *sql.DB) http.Handler {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Err: routes.ErrInvalidID,
+			}.WriteError(w)
 			return
 		}
 		
 		mappings, err := service.GetRouteByID(id)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Err: routes.ErrDBQueryFailed,
+			}.WriteError(w)
 			return
 		}		
 
@@ -54,19 +64,28 @@ func AddRequest(db *sql.DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Err: routes.ErrReadBody,
+			}.WriteError(w)
 			return
 		}
 				
 		err = json.Unmarshal(body, &mapping)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Err: routes.ErrUnmarshalJSON,
+			}.WriteError(w)
 			return
 		}
 		
 		_, err = service.AddRoute(mapping)
 		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Err: routes.ErrDBQueryFailed,
+			}.WriteError(w)
 			return
 		}
 	})
