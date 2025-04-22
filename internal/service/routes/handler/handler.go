@@ -35,7 +35,7 @@ func (rh *RoutesHandler) GetAll() http.Handler {
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
-				Err: routes.ErrDBQueryFailed,
+				Msg: routes.ErrDBQueryFailed.Error(),
 			}.WriteError(w)
 			return
 		}		
@@ -51,7 +51,7 @@ func (rh *RoutesHandler) GetRouteByID() http.Handler {
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
-				Err: routes.ErrInvalidID,
+				Msg: routes.ErrInvalidID.Error(),
 			}.WriteError(w)
 			return
 		}
@@ -60,7 +60,7 @@ func (rh *RoutesHandler) GetRouteByID() http.Handler {
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
-				Err: routes.ErrDBQueryFailed,
+				Msg: routes.ErrDBQueryFailed.Error(),
 			}.WriteError(w)
 			return
 		}		
@@ -77,7 +77,7 @@ func (rh *RoutesHandler) AddRoute() http.Handler {
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
-				Err: routes.ErrReadBody,
+				Msg: routes.ErrReadBody.Error(),
 			}.WriteError(w)
 			return
 		}
@@ -86,7 +86,7 @@ func (rh *RoutesHandler) AddRoute() http.Handler {
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
-				Err: routes.ErrUnmarshalJSON,
+				Msg: routes.ErrUnmarshalJSON.Error(),
 			}.WriteError(w)
 			return
 		}
@@ -95,7 +95,7 @@ func (rh *RoutesHandler) AddRoute() http.Handler {
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
-				Err: routes.ErrDBQueryFailed,
+				Msg: routes.ErrDBQueryFailed.Error(),
 			}.WriteError(w)
 			return
 		}

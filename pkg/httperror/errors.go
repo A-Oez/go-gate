@@ -6,11 +6,11 @@ import (
 )
 
 type DefaultError struct {
-	Status int
-	Err    error
+	Status int		`json:"status"`			
+	Msg    string 	`json:"error_message"`
 }
 
-func (de DefaultError) WriteError(w http.ResponseWriter) {
-	w.WriteHeader(de.Status)
-	json.NewEncoder(w).Encode(de.Err)
+func (err DefaultError) WriteError(w http.ResponseWriter) {
+	w.WriteHeader(err.Status)
+	json.NewEncoder(w).Encode(err)
 }
