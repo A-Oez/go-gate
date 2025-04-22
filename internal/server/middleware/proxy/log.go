@@ -1,8 +1,8 @@
-package proxylog
+package proxy
 
 import (
 	"encoding/json"
-	entity "go-gate/internal/db/entity/mapping"
+	"go-gate/internal/service/routes/entity"
 	"log"
 	"net/http"
 	"time"
@@ -19,7 +19,7 @@ func (lrw *LoggingResponseWriter) WriteHeader(code int) {
     lrw.ResponseWriter.WriteHeader(code)
 }
 
-type proxyLogEntry struct {
+type proxyLog struct {
 	RequestID    string `json:"request_id"`
 	ClientPath    string `json:"client_path"`
 	ServiceURL   string `json:"service_url"`
@@ -27,8 +27,8 @@ type proxyLogEntry struct {
 	Timestamp    string `json:"timestamp"`
 }
 
-func Log(statusCode int, requestID string, entity entity.ProxyMapping) {
-	entry := proxyLogEntry{
+func Log(statusCode int, requestID string, entity entity.Route) {
+	entry := proxyLog{
 		RequestID:  requestID,
 		ClientPath: entity.PublicPath,
 		ServiceURL: entity.ServiceHost + entity.ServicePath,

@@ -1,46 +1,46 @@
-package mapping
+package repo
 
 import (
 	"database/sql"
-	entity "go-gate/internal/db/entity/mapping"
+	"go-gate/internal/service/routes/entity"
 )
 
-type MappingRepository struct {
+type RouteRepository struct {
 	DB *sql.DB
 }
 
-func NewMappingRepository(db *sql.DB) *MappingRepository{
-	return &MappingRepository{
+func NewRouteRepository(db *sql.DB) *RouteRepository{
+	return &RouteRepository{
 		DB: db,
 	}
 }
 
-func (r *MappingRepository) GetAll() ([]entity.ProxyMapping, error) {
-	rows, err := r.DB.Query("SELECT * FROM mappings")
+func (r *RouteRepository) GetAll() ([]entity.Route, error) {
+	rows, err := r.DB.Query("SELECT * FROM routes")
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
 
-	var mappings []entity.ProxyMapping
+	var routes []entity.Route
 	for rows.Next() {
-		var mapping entity.ProxyMapping
-		err := rows.Scan(&mapping.ID, &mapping.Method, &mapping.PublicPath, &mapping.ServiceScheme, &mapping.ServiceHost, &mapping.ServicePath)
+		var route entity.Route
+		err := rows.Scan(&route.ID, &route.Method, &route.PublicPath, &route.ServiceScheme, &route.ServiceHost, &route.ServicePath)
 		if err != nil {
 			return nil, err
 		}
-		mappings = append(mappings, mapping)
+		routes = append(routes, route)
 	}
 
-	return mappings, nil
+	return routes, nil
 }
 
-func (r *MappingRepository) GetRequestByClient(method string, publicPath string) (entity.ProxyMapping, error) {
-	var mapping entity.ProxyMapping
+func (r *RouteRepository) GetRouteByClient(method string, publicPath string) (entity.Route, error) {
+	var mapping entity.Route
 
 	query := `
 		SELECT *
-		FROM mappings
+		FROM routes
 		WHERE method = $1 AND public_path = $2
 	`
 	
@@ -61,9 +61,9 @@ func (r *MappingRepository) GetRequestByClient(method string, publicPath string)
 	return mapping, nil
 }
 
-func (r *MappingRepository) AddRequest(entity entity.ProxyMappingAdd) (bool, error) {
+func (r *RouteRepository) AddRoute(entity entity.AddRoute) (bool, error) {
 	query := `
-		INSERT INTO mappings (method, public_path, service_scheme, service_host, service_path)
+		INSERT INTO routes (method, public_path, service_scheme, service_host, service_path)
 		VALUES ($1, $2, $3, $4, $5);
 	`
 	
@@ -82,12 +82,12 @@ func (r *MappingRepository) AddRequest(entity entity.ProxyMappingAdd) (bool, err
 	return true, nil
 }
 
-func (r *MappingRepository) GetRequestMappingByID(id int) (entity.ProxyMapping, error) {
-	var mapping entity.ProxyMapping
+func (r *RouteRepository) GetRouteByID(id int) (entity.Route, error) {
+	var mapping entity.Route
 
 	query := `
 		SELECT *
-		FROM mappings
+		FROM routes
 		WHERE id = $1
 	`
 	

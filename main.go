@@ -4,7 +4,6 @@ import (
 	"go-gate/internal/db"
 	sr "go-gate/internal/server"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -22,10 +21,5 @@ func main() {
 	}
 	defer db.Close()
 
-	server := sr.NewServer(db)
-	server.RegisterRouter()
-
-	port := ":" + os.Getenv("BACKEND_PORT")
-	log.Printf("HTTPS Server runs on port %s", port)
-	log.Fatal(http.ListenAndServe(port, server.Mux))
+	sr.NewServer(db).Start(":" + os.Getenv("BACKEND_PORT"))
 }

@@ -2,11 +2,10 @@ package proxy
 
 import (
 	"database/sql"
-	entity "go-gate/internal/db/entity/mapping"
-	repo "go-gate/internal/db/repo/mapping"
 	"go-gate/internal/server/middleware/logging"
-	service "go-gate/internal/service/mapping"
-	"go-gate/pkg/proxy/proxylog"
+	"go-gate/internal/service/routes"
+	"go-gate/internal/service/routes/entity"
+	"go-gate/internal/service/routes/repo"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -22,8 +21,8 @@ func ReverseProxy(db *sql.DB) http.Handler {
 			return
 		}
 
-		service := service.NewMappingService(repo.NewMappingRepository(db))
-		proxyRoute, err := service.GetRequestByClient(r.Method, trimSuffix(r.URL.Path))
+		service := routes.NewMappingService(repo.NewRouteRepository(db))
+		proxyRoute, err := service.GetRouteByClient(r.Method, trimSuffix(r.URL.Path))
 		if err != nil {
 			log.Println(err.Error())
 			http.Error(w, "Internal Server Error", http.StatusNotFound)
@@ -31,10 +30,10 @@ func ReverseProxy(db *sql.DB) http.Handler {
 		}
 		
 		proxy := newReverseProxy(requestID, proxyRoute)
-        lrw := &proxylog.LoggingResponseWriter{w, http.StatusOK}
+        lrw := &LoggingResponseWriter{w, http.StatusOK}
 		proxy.ServeHTTP(lrw, r)
 
-		proxylog.Log(lrw.StatusCode, requestID, proxyRoute)
+		Log(lrw.StatusCode, requestID, proxyRoute)
     })
 }
 
@@ -46,7 +45,7 @@ func getRequestID(r *http.Request) string {
 	return id
 }
 
-func newReverseProxy(requestID string, entity entity.ProxyMapping) *httputil.ReverseProxy {
+func newReverseProxy(requestID string, entity entity.Route) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.Header.Del("X-Forwarded-For")

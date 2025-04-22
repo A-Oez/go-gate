@@ -1,21 +1,21 @@
-package mapping
+package handler
 
 import (
 	"database/sql"
 	"encoding/json"
-	entity "go-gate/internal/db/entity/mapping"
-	repo "go-gate/internal/db/repo/mapping"
-	service "go-gate/internal/service/mapping"
+	"go-gate/internal/service/routes"
+	"go-gate/internal/service/routes/entity"
+	"go-gate/internal/service/routes/repo"
 	"io"
 	"net/http"
 	"strconv"
 )
 
 func GetRequestMappings(db *sql.DB) http.Handler {
-	service := service.NewMappingService(repo.NewMappingRepository(db))
+	service := routes.NewMappingService(repo.NewRouteRepository(db))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		mappings, err := service.GetAllMappings()
+		mappings, err := service.GetAll()
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
@@ -27,7 +27,7 @@ func GetRequestMappings(db *sql.DB) http.Handler {
 }
 
 func GetRequestMappingByID(db *sql.DB) http.Handler {
-	service := service.NewMappingService(repo.NewMappingRepository(db))
+	service := routes.NewMappingService(repo.NewRouteRepository(db))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
@@ -37,7 +37,7 @@ func GetRequestMappingByID(db *sql.DB) http.Handler {
 			return
 		}
 		
-		mappings, err := service.GetRequestMappingByID(id)
+		mappings, err := service.GetRouteByID(id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -48,8 +48,8 @@ func GetRequestMappingByID(db *sql.DB) http.Handler {
 }
 
 func AddRequest(db *sql.DB) http.Handler {
-	var mapping entity.ProxyMappingAdd
-	service := service.NewMappingService(repo.NewMappingRepository(db))
+	var mapping entity.AddRoute
+	service := routes.NewMappingService(repo.NewRouteRepository(db))
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
@@ -64,7 +64,7 @@ func AddRequest(db *sql.DB) http.Handler {
 			return
 		}
 		
-		_, err = service.AddRequest(mapping)
+		_, err = service.AddRoute(mapping)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return

@@ -1,6 +1,4 @@
--- up.sql
-
-CREATE TABLE mappings (
+CREATE TABLE routes (
     id SERIAL PRIMARY KEY,
     method VARCHAR(10),
     public_path VARCHAR(255),
@@ -9,7 +7,6 @@ CREATE TABLE mappings (
     service_path VARCHAR(255)
 );
 
--- Optional: Füge einige Anfangsdaten hinzu
-INSERT INTO mappings (method, public_path, service_scheme, service_host, service_path)
+INSERT INTO routes (method, public_path, service_scheme, service_host, service_path)
 VALUES
 ('GET', '/api', 'http', 'apitest:8080', '/test');

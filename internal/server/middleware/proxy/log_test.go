@@ -1,4 +1,4 @@
-package proxylog
+package proxy
 
 import (
 	"net/http"
