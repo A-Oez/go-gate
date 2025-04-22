@@ -5,54 +5,50 @@ import (
 )
 
 
-type MappingRepository interface {
+type RoutesRepository interface {
 	GetAll() ([]entity.Route, error)
 	GetRouteByClient(method string, publicPath string) (entity.Route, error)
 	GetRouteByID(id int) (entity.Route, error)
 	AddRoute(entity entity.AddRoute) (bool, error)
 }
 
-type MappingService struct {
-	MappingRepository MappingRepository
+type RoutesService struct {
+	repository RoutesRepository
 }
 
-func NewMappingService(mappingRepository MappingRepository) *MappingService {
-	return &MappingService{
-		MappingRepository: mappingRepository,
+func NewRoutesService(repo RoutesRepository) *RoutesService {
+	return &RoutesService{
+		repository: repo,
 	}
 }
 
-func (ms *MappingService) GetAll() ([]entity.Route, error) {
-	mappings, err := ms.MappingRepository.GetAll()
+func (rs *RoutesService) GetAll() ([]entity.Route, error) {
+	routes, err := rs.repository.GetAll()
 	if err != nil {
 		return nil, err
 	}
 
-	return mappings, nil
+	return routes, nil
 }
 
-func (ms *MappingService) GetRouteByClient(method string, publicPath string) (entity.Route, error) {
-	var mapping entity.Route
-	
-	mapping, err := ms.MappingRepository.GetRouteByClient(method, publicPath)
+func (rs *RoutesService) GetRouteByClient(method string, publicPath string) (entity.Route, error) {	
+	route, err := rs.repository.GetRouteByClient(method, publicPath)
 	if err != nil {
-		return mapping, err
+		return route, err
 	}
 
-	return mapping, nil
+	return route, nil
 }
 
-func (ms *MappingService) GetRouteByID(id int) (entity.Route, error) {
-	var mapping entity.Route
-	
-	mapping, err := ms.MappingRepository.GetRouteByID(id)
+func (rs *RoutesService) GetRouteByID(id int) (entity.Route, error) {	
+	route, err := rs.repository.GetRouteByID(id)
 	if err != nil {
-		return mapping, err
+		return route, err
 	}
 
-	return mapping, nil
+	return route, nil
 }
 
-func (ms *MappingService) AddRoute(entity entity.AddRoute) (bool, error) {
-	return ms.MappingRepository.AddRoute(entity)
+func (rs *RoutesService) AddRoute(entity entity.AddRoute) (bool, error) {
+	return rs.repository.AddRoute(entity)
 }

@@ -21,7 +21,7 @@ func ReverseProxy(db *sql.DB) http.Handler {
 			return
 		}
 
-		service := routes.NewMappingService(repo.NewRouteRepository(db))
+		service := routes.NewRoutesService(repo.NewRouteRepository(db))
 		proxyRoute, err := service.GetRouteByClient(r.Method, trimSuffix(r.URL.Path))
 		if err != nil {
 			log.Println(err.Error())

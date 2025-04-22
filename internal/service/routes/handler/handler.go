@@ -12,11 +12,25 @@ import (
 	"strconv"
 )
 
-func GetRequestMappings(db *sql.DB) http.Handler {
-	service := routes.NewMappingService(repo.NewRouteRepository(db))
+type RoutesHandler struct{
+	service RoutesService
+}
 
+type RoutesService interface {
+	GetAll() ([]entity.Route, error)
+	GetRouteByID(id int) (entity.Route, error)
+	AddRoute(entity entity.AddRoute) (bool, error)
+}
+
+func NewRoutesHandler(db *sql.DB) *RoutesHandler {
+	return &RoutesHandler{
+		service: routes.NewRoutesService(repo.NewRouteRepository(db)),
+	}
+}
+
+func (rh *RoutesHandler) GetAll() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		mappings, err := service.GetAll()
+		entity, err := rh.service.GetAll()
 
 		if err != nil {
 			httperror.DefaultError{
@@ -26,13 +40,11 @@ func GetRequestMappings(db *sql.DB) http.Handler {
 			return
 		}		
 
-		json.NewEncoder(w).Encode(&mappings)
+		json.NewEncoder(w).Encode(&entity)
 	})
 }
 
-func GetRequestMappingByID(db *sql.DB) http.Handler {
-	service := routes.NewMappingService(repo.NewRouteRepository(db))
-
+func (rh *RoutesHandler) GetRouteByID() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		idStr := r.PathValue("id")
 		id, err := strconv.Atoi(idStr)
@@ -44,7 +56,7 @@ func GetRequestMappingByID(db *sql.DB) http.Handler {
 			return
 		}
 		
-		mappings, err := service.GetRouteByID(id)
+		entity, err := rh.service.GetRouteByID(id)
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
@@ -53,13 +65,12 @@ func GetRequestMappingByID(db *sql.DB) http.Handler {
 			return
 		}		
 
-		json.NewEncoder(w).Encode(&mappings)
+		json.NewEncoder(w).Encode(&entity)
 	})
 }
 
-func AddRequest(db *sql.DB) http.Handler {
-	var mapping entity.AddRoute
-	service := routes.NewMappingService(repo.NewRouteRepository(db))
+func (rh *RoutesHandler) AddRoute() http.Handler {
+	var entity entity.AddRoute
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		body, err := io.ReadAll(r.Body)
@@ -71,7 +82,7 @@ func AddRequest(db *sql.DB) http.Handler {
 			return
 		}
 				
-		err = json.Unmarshal(body, &mapping)
+		err = json.Unmarshal(body, &entity)
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
@@ -80,7 +91,7 @@ func AddRequest(db *sql.DB) http.Handler {
 			return
 		}
 		
-		_, err = service.AddRoute(mapping)
+		_, err = rh.service.AddRoute(entity)
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,

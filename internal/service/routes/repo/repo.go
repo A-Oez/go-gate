@@ -36,7 +36,7 @@ func (r *RouteRepository) GetAll() ([]entity.Route, error) {
 }
 
 func (r *RouteRepository) GetRouteByClient(method string, publicPath string) (entity.Route, error) {
-	var mapping entity.Route
+	var entity entity.Route
 
 	query := `
 		SELECT *
@@ -46,19 +46,19 @@ func (r *RouteRepository) GetRouteByClient(method string, publicPath string) (en
 	
 	row := r.DB.QueryRow(query, method, publicPath)
 	err := row.Scan(
-		&mapping.ID,
-		&mapping.Method,
-		&mapping.PublicPath,
-		&mapping.ServiceScheme,
-		&mapping.ServiceHost,
-		&mapping.ServicePath,
+		&entity.ID,
+		&entity.Method,
+		&entity.PublicPath,
+		&entity.ServiceScheme,
+		&entity.ServiceHost,
+		&entity.ServicePath,
 	)
 
 	if err != nil {
-		return mapping, err
+		return entity, err
 	}
 
-	return mapping, nil
+	return entity, nil
 }
 
 func (r *RouteRepository) AddRoute(entity entity.AddRoute) (bool, error) {
@@ -83,7 +83,7 @@ func (r *RouteRepository) AddRoute(entity entity.AddRoute) (bool, error) {
 }
 
 func (r *RouteRepository) GetRouteByID(id int) (entity.Route, error) {
-	var mapping entity.Route
+	var entity entity.Route
 
 	query := `
 		SELECT *
@@ -93,17 +93,17 @@ func (r *RouteRepository) GetRouteByID(id int) (entity.Route, error) {
 	
 	row := r.DB.QueryRow(query, id)
 	err := row.Scan(
-		&mapping.ID,
-		&mapping.Method,
-		&mapping.PublicPath,
-		&mapping.ServiceScheme,
-		&mapping.ServiceHost,
-		&mapping.ServicePath,
+		&entity.ID,
+		&entity.Method,
+		&entity.PublicPath,
+		&entity.ServiceScheme,
+		&entity.ServiceHost,
+		&entity.ServicePath,
 	)
 
 	if err != nil {
-		return mapping, err
+		return entity, err
 	}
 
-	return mapping, nil
+	return entity, nil
 }
