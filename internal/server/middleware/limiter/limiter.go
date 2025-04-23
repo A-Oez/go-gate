@@ -1,18 +1,13 @@
 package limiter
 
 import (
-	"encoding/json"
+	"go-gate/pkg/httperror"
 	"net/http"
 	"sync"
 	"time"
 
 	"golang.org/x/time/rate"
 )
-
-type message struct{
-	Status string
-	Msg string
-}
 
 var (
 	ipLimiters = make(map[string]*rate.Limiter)
@@ -46,13 +41,10 @@ func RateLimiter(next http.Handler) http.Handler {
 		if limiter.Allow() {
 			next.ServeHTTP(w, r)
 		} else {
-			msg := message{
-                Status: "Request Failed",
-                Msg:   "Try again later",
-            }
-
-            w.WriteHeader(http.StatusTooManyRequests)
-            json.NewEncoder(w).Encode(&msg)
+			httperror.DefaultError{
+				Status: http.StatusTooManyRequests,
+				Msg: httperror.ErrTooManyRequest.Error(),
+			}.WriteError(w)
             return
 		}
 	})

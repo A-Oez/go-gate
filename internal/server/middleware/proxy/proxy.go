@@ -2,11 +2,12 @@ package proxy
 
 import (
 	"database/sql"
+	"errors"
 	"go-gate/internal/server/middleware/logging"
 	"go-gate/internal/service/routes"
 	"go-gate/internal/service/routes/entity"
 	"go-gate/internal/service/routes/repo"
-	"log"
+	"go-gate/pkg/httperror"
 	"net/http"
 	"net/http/httputil"
 	"strings"
@@ -17,16 +18,22 @@ func ReverseProxy(db *sql.DB) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestID := getRequestID(r)
 		if requestID == "" {
-			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Msg: httperror.ErrInternalServer.Error(),
+				Error: errors.New("couldnt create request ID, check inbound_logging middleware"),
+			}.WriteError(w)
+            return
 		}
 
 		service := routes.NewRoutesService(repo.NewRouteRepository(db))
 		proxyRoute, err := service.GetRouteByClient(r.Method, trimSuffix(r.URL.Path))
 		if err != nil {
-			log.Println(err.Error())
-			http.Error(w, "Internal Server Error", http.StatusNotFound)
-			return
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Msg: httperror.ErrRouteNotFound.Error(),
+			}.WriteError(w)
+            return
 		}
 		
 		proxy := newReverseProxy(requestID, proxyRoute)
