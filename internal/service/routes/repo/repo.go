@@ -123,3 +123,30 @@ func (r *RouteRepository) DeleteRouteByID(id int) (bool, error) {
 
 	return true, nil
 }
+
+func (r *RouteRepository) UpdateRoute(entity entity.Route) (bool, error) {
+	query := `
+		UPDATE routes 
+		SET method = $1, 
+		public_path = $2,
+		service_scheme = $3, 
+		service_host = $4, 
+		service_path = $5
+		WHERE id = $6
+	`
+
+	_, err := r.DB.Exec(query,
+		entity.Method,
+		entity.PublicPath,
+		entity.ServiceScheme,
+		entity.ServiceHost,
+		entity.ServicePath,
+		entity.ID,
+	)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

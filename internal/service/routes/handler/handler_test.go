@@ -24,6 +24,10 @@ func (m *mockRoutesService) AddRoute(e entity.AddRoute) (bool, error) {
 	return true, nil
 }
 
+func (m *mockRoutesService) UpdateRoute(e entity.Route) (bool, error) {
+	return true, nil
+}
+
 func (m *mockRoutesService) DeleteRouteByID(id int) (bool, error) {
 	return true, nil
 }

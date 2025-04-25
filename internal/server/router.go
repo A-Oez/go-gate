@@ -12,6 +12,7 @@ func (s *Server) registerRouter() {
 
 	//routes
 	s.Mux.Handle("POST /api/routes", limiter.RateLimiter((s.Routes.AddRoute())))
+	s.Mux.Handle("PUT /api/routes/{id}", limiter.RateLimiter((s.Routes.UpdateRoute())))
 	s.Mux.Handle("GET /api/routes", limiter.RateLimiter((s.Routes.GetAll())))
 	s.Mux.Handle("GET /api/routes/{id}", limiter.RateLimiter((s.Routes.GetRouteByID())))
 	s.Mux.Handle("DELETE /api/routes/{id}", limiter.RateLimiter(s.Routes.DeleteRouteByID()))
