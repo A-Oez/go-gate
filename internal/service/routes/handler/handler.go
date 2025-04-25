@@ -20,6 +20,7 @@ type RoutesService interface {
 	GetAll() ([]entity.Route, error)
 	GetRouteByID(id int) (entity.Route, error)
 	AddRoute(entity entity.AddRoute) (bool, error)
+	DeleteRouteByID(id int) (bool, error)
 }
 
 func NewRoutesHandler(db *sql.DB) *RoutesHandler {
@@ -99,5 +100,30 @@ func (rh *RoutesHandler) AddRoute() http.Handler {
 			}.WriteError(w)
 			return
 		}
+	})
+}
+
+func (rh *RoutesHandler) DeleteRouteByID() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		idStr := r.PathValue("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Msg: routes.ErrInvalidID.Error(),
+			}.WriteError(w)
+			return
+		}
+		
+		entity, err := rh.service.DeleteRouteByID(id)
+		if err != nil {
+			httperror.DefaultError{
+				Status: http.StatusInternalServerError,
+				Msg: routes.ErrDBQueryFailed.Error(),
+			}.WriteError(w)
+			return
+		}		
+
+		json.NewEncoder(w).Encode(&entity)
 	})
 }

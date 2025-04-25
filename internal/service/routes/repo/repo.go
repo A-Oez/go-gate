@@ -107,3 +107,19 @@ func (r *RouteRepository) GetRouteByID(id int) (entity.Route, error) {
 
 	return entity, nil
 }
+
+func (r *RouteRepository) DeleteRouteByID(id int) (bool, error) {
+	query := `
+		DELETE FROM routes WHERE id = $1
+	`
+
+	_, err := r.DB.Exec(query,
+		id,
+	)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}

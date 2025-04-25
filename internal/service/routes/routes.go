@@ -10,6 +10,7 @@ type RoutesRepository interface {
 	GetRouteByClient(method string, publicPath string) (entity.Route, error)
 	GetRouteByID(id int) (entity.Route, error)
 	AddRoute(entity entity.AddRoute) (bool, error)
+	DeleteRouteByID(id int) (bool, error)
 }
 
 type RoutesService struct {
@@ -51,4 +52,8 @@ func (rs *RoutesService) GetRouteByID(id int) (entity.Route, error) {
 
 func (rs *RoutesService) AddRoute(entity entity.AddRoute) (bool, error) {
 	return rs.repository.AddRoute(entity)
+}
+
+func (rs *RoutesService) DeleteRouteByID(id int) (bool, error) {
+	return rs.repository.DeleteRouteByID(id)
 }
