@@ -42,6 +42,7 @@ func InboundLogging(next http.Handler) http.Handler {
 
         ctx := r.Context()
 		ctx = context.WithValue(ctx, ContextKey("RequestID"), requestID)
+        ctx = context.WithValue(ctx, ContextKey("RemoteAddr"), r.RemoteAddr)
 		r = r.WithContext(ctx)
 
         next.ServeHTTP(w, r)

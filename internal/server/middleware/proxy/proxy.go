@@ -17,6 +17,7 @@ import (
 func ReverseProxy(db *sql.DB) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestID := getRequestID(r)
+		remoteAddr := getRemoteAddr(r)
 		if requestID == "" {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
@@ -36,7 +37,7 @@ func ReverseProxy(db *sql.DB) http.Handler {
             return
 		}
 		
-		proxy := newReverseProxy(requestID, proxyRoute)
+		proxy := newReverseProxy(requestID, remoteAddr, proxyRoute)
         lrw := &LoggingResponseWriter{w, http.StatusOK}
 		proxy.ServeHTTP(lrw, r)
 
@@ -52,7 +53,15 @@ func getRequestID(r *http.Request) string {
 	return id
 }
 
-func newReverseProxy(requestID string, entity entity.Route) *httputil.ReverseProxy {
+func getRemoteAddr(r *http.Request) string {
+	ip, ok := r.Context().Value(logging.ContextKey("RemoteAddr")).(string)
+	if !ok {
+		return ""
+	}
+	return ip
+}
+
+func newReverseProxy(requestID string, remoteAddr string, entity entity.Route) *httputil.ReverseProxy {
 	return &httputil.ReverseProxy{
 		Director: func(req *http.Request) {
 			req.Header.Del("X-Forwarded-For")
@@ -62,7 +71,7 @@ func newReverseProxy(requestID string, entity entity.Route) *httputil.ReversePro
 			req.URL.Host = entity.ServiceHost
 			req.URL.Path = entity.ServicePath
 
-			req.Header.Set("X-Forwarded-Proto", "https")
+			req.Header.Set("X-Client-IP", remoteAddr)
 			req.Header.Set("X-Forwarded-Host", req.Host)
 			req.Header.Set("X-Request-ID", requestID)
 			req.Header.Set("X-Request-Timestamp", time.Now().Format(time.RFC3339))

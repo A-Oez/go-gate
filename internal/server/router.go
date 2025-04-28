@@ -10,10 +10,10 @@ func (s *Server) registerRouter() {
 	//proxy routing
 	s.Mux.Handle("GET /api/", middleware.Handle()(proxy.ReverseProxy(s.Db)))
 
-	//routes
-	s.Mux.Handle("POST /api/routes", limiter.RateLimiter((s.Routes.AddRoute())))
-	s.Mux.Handle("PUT /api/routes/{id}", limiter.RateLimiter((s.Routes.UpdateRoute())))
-	s.Mux.Handle("GET /api/routes", limiter.RateLimiter((s.Routes.GetAll())))
-	s.Mux.Handle("GET /api/routes/{id}", limiter.RateLimiter((s.Routes.GetRouteByID())))
-	s.Mux.Handle("DELETE /api/routes/{id}", limiter.RateLimiter(s.Routes.DeleteRouteByID()))
+	//admin routes
+	s.Mux.Handle("POST /admin/routes", limiter.RateLimiter((s.Routes.AddRoute())))
+	s.Mux.Handle("PUT /admin/routes/{id}", limiter.RateLimiter((s.Routes.UpdateRoute())))
+	s.Mux.Handle("GET /admin/routes", limiter.RateLimiter((s.Routes.GetAll())))
+	s.Mux.Handle("GET /admin/routes/{id}", limiter.RateLimiter((s.Routes.GetRouteByID())))
+	s.Mux.Handle("DELETE /admin/routes/{id}", limiter.RateLimiter(s.Routes.DeleteRouteByID()))
 }
