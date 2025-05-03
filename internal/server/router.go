@@ -11,6 +11,7 @@ func (s *Server) registerRouter() {
 	s.Mux.Handle("GET /api/", middleware.Handle()(proxy.ReverseProxy(s.Db)))
 
 	//admin routes
+	s.Mux.Handle("GET /admin/login", limiter.RateLimiter(s.AdminAuth.Login()))
 	s.Mux.Handle("POST /admin/routes", limiter.RateLimiter((s.Routes.AddRoute())))
 	s.Mux.Handle("PUT /admin/routes/{id}", limiter.RateLimiter((s.Routes.UpdateRoute())))
 	s.Mux.Handle("GET /admin/routes", limiter.RateLimiter((s.Routes.GetAll())))

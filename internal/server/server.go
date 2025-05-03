@@ -2,6 +2,7 @@ package server
 
 import (
 	"database/sql"
+	adminauth "go-gate/internal/service/admin_auth/handler"
 	routes "go-gate/internal/service/routes/handler"
 	"log"
 	"net/http"
@@ -10,16 +11,18 @@ import (
 )
 
 type Server struct {
-	Db  	*sql.DB
-	Mux 	*http.ServeMux
-	Routes  *routes.RoutesHandler
+	Db			*sql.DB
+	Mux			*http.ServeMux
+	Routes		*routes.RoutesHandler
+	AdminAuth	*adminauth.AdminAuthHandler 
 }
 
 func NewServer(db *sql.DB) *Server {
 	return &Server{
-		Db:  db,
-		Mux: http.NewServeMux(),
-		Routes: routes.NewRoutesHandler(db),
+		Db:			db,
+		Mux:		http.NewServeMux(),
+		Routes:		routes.NewRoutesHandler(db),
+		AdminAuth:	adminauth.NewAdminAuthHandler(db),
 	}
 }
 
