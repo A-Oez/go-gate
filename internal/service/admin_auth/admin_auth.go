@@ -29,12 +29,11 @@ func (as AdminAuthService) Login(credentials entity.AdminCredentials) (time.Time
 	} 
 
 	ok, err := AuthorizeUser(user, credentials)
-	if !ok{
+	if !ok {
 		return time.Time{}, err
 	}
 
-	//TODO: create session, return expriesAt time
-	return time.Time{}, nil
+	return as.repository.CreateSession(user)
 }
 
 func AuthorizeUser(user entity.AdminUser, credentials entity.AdminCredentials) (bool, error) {
