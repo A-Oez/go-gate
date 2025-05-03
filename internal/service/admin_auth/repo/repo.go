@@ -37,3 +37,27 @@ func (ar *AdminAuthRepository) CreateSession(user entity.AdminUser) (time.Time, 
 
 	return expires_at, nil
 }
+
+func (ar *AdminAuthRepository) GetUserByMail(email string) (entity.AdminUser, error){
+	var entity entity.AdminUser
+
+	query := `
+		SELECT *
+		FROM admin_users
+		WHERE email = $1
+	`
+	
+	row := ar.DB.QueryRow(query, email)
+	err := row.Scan(
+		&entity.ID,
+		&entity.Email,
+		&entity.Password,
+		&entity.CreatedAt,
+	)
+
+	if err != nil {
+		return entity, err
+	}
+
+	return entity, nil
+}
