@@ -2,13 +2,12 @@ package adminauth
 
 import (
 	"go-gate/internal/service/admin_auth/entity"
-	"time"
 
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AdminAuthRepository interface {
-	CreateSession(user entity.AdminUser) (time.Time, error)
+	CreateSession(user entity.AdminUser) (entity.SessionCreationResp, error)
 	GetUserByMail(email string) (entity.AdminUser, error)
 }
 
@@ -22,15 +21,15 @@ func NewAdminAuthServiceService(repo AdminAuthRepository) *AdminAuthService {
 	}
 }
 
-func (as AdminAuthService) Login(credentials entity.AdminCredentials) (time.Time, error) {
+func (as AdminAuthService) Login(credentials entity.AdminCredentials) (entity.SessionCreationResp, error) {
 	user, err := as.repository.GetUserByMail(credentials.Email)
 	if err != nil {
-		return time.Time{}, err
+		return entity.SessionCreationResp{}, err
 	} 
 
 	ok, err := AuthorizeUser(user, credentials)
 	if !ok {
-		return time.Time{}, err
+		return entity.SessionCreationResp{}, err
 	}
 
 	return as.repository.CreateSession(user)

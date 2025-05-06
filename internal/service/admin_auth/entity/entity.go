@@ -1,6 +1,10 @@
 package entity
 
-import "time"
+import (
+	"time"
+
+	"github.com/google/uuid"
+)
 
 type AdminUser struct {
 	ID           int       `json:"id"`
@@ -15,8 +19,13 @@ type AdminCredentials struct {
 }
 
 type Session struct {
-	ID         int       `json:"id"`         
+	ID         uuid.UUID `json:"id"`         
 	UserEmail  string    `json:"user_email"` 
 	CreatedAt  time.Time `json:"created_at"` 
+	ExpiresAt  time.Time `json:"expires_at"` 
+}
+
+type SessionCreationResp struct {
+	ID         uuid.UUID `json:"id"` 
 	ExpiresAt  time.Time `json:"expires_at"` 
 }

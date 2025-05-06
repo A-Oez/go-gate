@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"go-gate/internal/service/admin_auth/entity"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 type AdminAuthRepository struct {
@@ -16,26 +18,28 @@ func NewAdminAuthRepository(db *sql.DB) *AdminAuthRepository {
 	}
 }
 
-func (ar *AdminAuthRepository) CreateSession(user entity.AdminUser) (time.Time, error){
+func (ar *AdminAuthRepository) CreateSession(user entity.AdminUser) (entity.SessionCreationResp, error){
 	query := `
-		INSERT INTO sessions (user_email, created_at, expires_at)
-		VALUES ($1, $2, $3);
+		INSERT INTO sessions (id, user_email, created_at, expires_at)
+		VALUES ($1, $2, $3, $4);
 	`
 
+	session_id := uuid.New()
 	now := time.Now().UTC()
 	expires_at := now.Add(time.Hour)
 	
 	_, err := ar.DB.Exec(query,
+		session_id,
 		user.Email,
 		now,
 		expires_at,
 	)
 
 	if err != nil {
-		return time.Time{}, err
+		return entity.SessionCreationResp{}, err
 	}
 
-	return expires_at, nil
+	return entity.SessionCreationResp{session_id, expires_at}, nil
 }
 
 func (ar *AdminAuthRepository) GetUserByMail(email string) (entity.AdminUser, error){

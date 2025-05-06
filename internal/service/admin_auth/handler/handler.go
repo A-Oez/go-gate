@@ -10,7 +10,6 @@ import (
 	"go-gate/pkg/httperror"
 	"io"
 	"net/http"
-	"time"
 )
 
 type AdminAuthHandler struct {
@@ -18,7 +17,7 @@ type AdminAuthHandler struct {
 }
 
 type AdminAuthService interface {
-	Login(credentials entity.AdminCredentials) (time.Time, error)
+	Login(credentials entity.AdminCredentials) (entity.SessionCreationResp, error)
 }
 
 func NewAdminAuthHandler(db *sql.DB) *AdminAuthHandler {
@@ -49,7 +48,7 @@ func (ah *AdminAuthHandler) Login() http.Handler {
 			return
 		}
 		
-		time, err := ah.service.Login(entity)
+		resp, err := ah.service.Login(entity)
 		if err != nil {
 			httperror.DefaultError{
 				Status: http.StatusInternalServerError,
@@ -58,6 +57,16 @@ func (ah *AdminAuthHandler) Login() http.Handler {
 			return
 		}
 
-		fmt.Fprintf(w, "%s", time.String())
+		http.SetCookie(w, &http.Cookie{
+			Name:     "session_id",
+			Value:    resp.ID.String(),
+			Path:     "/",
+			HttpOnly: true,
+			Secure:   true,
+			SameSite: http.SameSiteLaxMode,
+			Expires:  resp.ExpiresAt,
+		})
+
+		fmt.Fprintf(w, "%s", resp.ExpiresAt.String())
 	})
 }
