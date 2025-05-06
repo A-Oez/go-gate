@@ -39,8 +39,37 @@ func (ar *AdminAuthRepository) CreateSession(user entity.AdminUser) (entity.Sess
 		return entity.SessionCreationResp{}, err
 	}
 
-	return entity.SessionCreationResp{session_id, expires_at}, nil
+	resp := entity.SessionCreationResp{
+		ID: session_id,
+		ExpiresAt: expires_at,
+	}
+	return resp, nil
 }
+
+func (ar *AdminAuthRepository) GetSession(id string) (entity.Session, error){
+	var entity entity.Session
+
+	query := `
+		SELECT *
+		FROM sessions
+		WHERE id = $1
+	`
+	
+	row := ar.DB.QueryRow(query, id)
+	err := row.Scan(
+		&entity.ID,
+		&entity.UserEmail,
+		&entity.CreatedAt,
+		&entity.ExpiresAt,
+	)
+
+	if err != nil {
+		return entity, err
+	}
+
+	return entity, nil
+}
+
 
 func (ar *AdminAuthRepository) GetUserByMail(email string) (entity.AdminUser, error){
 	var entity entity.AdminUser

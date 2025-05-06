@@ -13,3 +13,5 @@ func Handle() Middleware {
 		return limiter.RateLimiter(logging.InboundLogging(h)) 
 	}
 }
+
+//TODO: add middleware func for admin auth

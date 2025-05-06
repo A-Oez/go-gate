@@ -9,6 +9,7 @@ import (
 type AdminAuthRepository interface {
 	CreateSession(user entity.AdminUser) (entity.SessionCreationResp, error)
 	GetUserByMail(email string) (entity.AdminUser, error)
+	GetSession(id string) (entity.Session, error)
 }
 
 type AdminAuthService struct {
@@ -33,6 +34,10 @@ func (as AdminAuthService) Login(credentials entity.AdminCredentials) (entity.Se
 	}
 
 	return as.repository.CreateSession(user)
+}
+
+func (as *AdminAuthService) GetSession(id string) (entity.Session, error) {
+	return as.repository.GetSession(id)
 }
 
 func AuthorizeUser(user entity.AdminUser, credentials entity.AdminCredentials) (bool, error) {
