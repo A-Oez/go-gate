@@ -7,5 +7,5 @@ CREATE TABLE admin_users (
 
 INSERT INTO admin_users (email, password_hash)
 VALUES 
-('admin@example.com', '$2a$10$93eqbLnM0JlzXOzv.kG/a/KnFEwY5.Lq4sToOp.EpDe/iV1PCgm/C'); --admin123
+('admin@example.com', '$2a$12$rG4snDm.xEbetwVu/o2I5.mw4C0dvNlFJQn8QZe/mdhXoMQAEUztq'); --admin123
 
