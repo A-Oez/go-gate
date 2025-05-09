@@ -16,7 +16,7 @@ type AdminAuthService struct {
 	repository AdminAuthRepository
 }
 
-func NewAdminAuthServiceService(repo AdminAuthRepository) *AdminAuthService {
+func NewAdminAuthService(repo AdminAuthRepository) *AdminAuthService {
 	return &AdminAuthService{
 		repository: repo,
 	}

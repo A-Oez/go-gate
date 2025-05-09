@@ -12,9 +12,9 @@ func (s *Server) registerRouter() {
 
 	//admin routes
 	s.Mux.Handle("POST /admin/login", limiter.RateLimiter(s.AdminAuth.Login()))
-	s.Mux.Handle("POST /admin/routes", limiter.RateLimiter((s.Routes.AddRoute())))
-	s.Mux.Handle("PUT /admin/routes/{id}", limiter.RateLimiter((s.Routes.UpdateRoute())))
-	s.Mux.Handle("GET /admin/routes", limiter.RateLimiter((s.Routes.GetAll())))
-	s.Mux.Handle("GET /admin/routes/{id}", limiter.RateLimiter((s.Routes.GetRouteByID())))
-	s.Mux.Handle("DELETE /admin/routes/{id}", limiter.RateLimiter(s.Routes.DeleteRouteByID()))
+	s.Mux.Handle("POST /admin/routes", middleware.HandleAdmin(s.Db)(s.Routes.AddRoute()))
+	s.Mux.Handle("PUT /admin/routes/{id}", middleware.HandleAdmin(s.Db)(s.Routes.UpdateRoute()))
+	s.Mux.Handle("GET /admin/routes", middleware.HandleAdmin(s.Db)(s.Routes.GetAll()))
+	s.Mux.Handle("GET /admin/routes/{id}", middleware.HandleAdmin(s.Db)(s.Routes.GetRouteByID()))
+	s.Mux.Handle("DELETE /admin/routes/{id}", middleware.HandleAdmin(s.Db)(s.Routes.DeleteRouteByID()))
 }

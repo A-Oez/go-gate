@@ -22,7 +22,7 @@ type AdminAuthService interface {
 
 func NewAdminAuthHandler(db *sql.DB) *AdminAuthHandler {
 	return &AdminAuthHandler{
-		service: adminauth.NewAdminAuthServiceService(repo.NewAdminAuthRepository(db)),
+		service: adminauth.NewAdminAuthService(repo.NewAdminAuthRepository(db)),
 	}
 }
 
