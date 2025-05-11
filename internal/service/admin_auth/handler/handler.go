@@ -18,6 +18,7 @@ type AdminAuthHandler struct {
 
 type AdminAuthService interface {
 	Login(credentials entity.AdminCredentials) (entity.SessionCreationResp, error)
+	GetSession(id string) (entity.Session, error)
 }
 
 func NewAdminAuthHandler(db *sql.DB) *AdminAuthHandler {
@@ -68,5 +69,35 @@ func (ah *AdminAuthHandler) Login() http.Handler {
 		})
 
 		fmt.Fprintf(w, "%s", resp.ExpiresAt.String())
+	})
+}
+
+func (ah *AdminAuthHandler) AuthAdmin(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		session_id := ""
+		for _, cookie := range r.Cookies() {
+			if(cookie.Name == "session_id"){
+				session_id = cookie.Value
+			}
+		}
+
+		if session_id == "" {
+			httperror.DefaultError{
+				Status: http.StatusUnauthorized,
+				Msg: adminauth.ErrInvalidSession.Error(),
+			}.WriteError(w)
+			return
+		}
+		
+		_, err := ah.service.GetSession(session_id)
+		if err != nil {
+			httperror.DefaultError{
+				Status: http.StatusUnauthorized,
+				Msg: err.Error(),
+			}.WriteError(w)
+			return
+		}
+
+		next.ServeHTTP(w, r)
 	})
 }
