@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"database/sql"
 	"go-gate/internal/server/middleware/limiter"
 	"go-gate/internal/server/middleware/logging"
 	adminauth "go-gate/internal/service/admin_auth/handler"
@@ -9,9 +10,9 @@ import (
 
 type Middleware func(http.Handler) http.Handler
 
-func Handle() Middleware {
+func Handle(db *sql.DB) Middleware {
 	return func(h http.Handler) http.Handler {
-		return limiter.RateLimiter(logging.InboundLogging(h))
+		return limiter.RateLimiter(logging.InboundLogging(db, h))
 	}
 }
 

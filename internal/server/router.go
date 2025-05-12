@@ -8,7 +8,7 @@ import (
 
 func (s *Server) registerRouter() {
 	//proxy routing
-	s.Mux.Handle("GET /api/", middleware.Handle()(proxy.ReverseProxy(s.Db)))
+	s.Mux.Handle("GET /api/", middleware.Handle(s.Db)(proxy.ReverseProxy(s.Db)))
 
 	//admin routes
 	s.Mux.Handle("POST /admin/login", limiter.RateLimiter(s.AdminAuth.Login()))
