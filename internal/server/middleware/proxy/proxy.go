@@ -1,6 +1,7 @@
 package proxy
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"go-gate/internal/server/middleware/logging"
@@ -13,6 +14,8 @@ import (
 	"strings"
 	"time"
 )
+
+type ContextKey string
 
 func ReverseProxy(db *sql.DB) http.Handler {
     return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +39,10 @@ func ReverseProxy(db *sql.DB) http.Handler {
 			}.WriteError(w)
             return
 		}
+		
+ 		ctx := r.Context()
+		ctx = context.WithValue(ctx, ContextKey("RouteID"), proxyRoute.ID)
+		r = r.WithContext(ctx)		
 		
 		proxy := newReverseProxy(requestID, remoteAddr, proxyRoute)
         lrw := &LoggingResponseWriter{w, http.StatusOK}
